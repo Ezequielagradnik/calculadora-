@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .calculadora {
+            background-color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .pantalla {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 24px;
+        }
+        .botones {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .operador {
+            background-color: #f44336;
+        }
+        .operador:hover {
+            background-color: #da190b;
+        }
+        .igual {
+            background-color: #008CBA;
+        }
+        .igual:hover {
+            background-color: #007399;
+        }
+        .borrar {
+            background-color: #555;
+        }
+        .borrar:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculadora">
+        <div class="pantalla">0</div>
+        <div class="botones">
+            <button>7</button>
+            <button>8</button>
+            <button>9</button>
+            <button class="operador">/</button>
+            <button>4</button>
+            <button>5</button>
+            <button>6</button>
+            <button class="operador">*</button>
+            <button>1</button>
+            <button>2</button>
+            <button>3</button>
+            <button class="operador">-</button>
+            <button>0</button>
+            <button>.</button>
+            <button class="igual">=</button>
+            <button class="operador">+</button>
+            <button class="borrar">C</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pantalla = document.querySelector('.pantalla');
+            const botones = document.querySelectorAll('button');
+            
+            let operacionActual = '';
+            let operacionAnterior = '';
+            let operacion = undefined;
+
+            botones.forEach(boton => {
+                boton.addEventListener('click', () => {
+                    const botonApretado = boton.textContent;
+
+                    if(botonApretado === 'C') {
+                        operacionActual = '';
+                        operacionAnterior = '';
+                        operacion = undefined;
+                    } else if(botonApretado === '+' || botonApretado === '-' || botonApretado === '*' || botonApretado === '/') {
+                        if(operacionActual === '') return;
+                        if(operacionAnterior !== '') {
+                            calcular();
+                        }
+                        operacion = botonApretado;
+                        operacionAnterior = operacionActual;
+                        operacionActual = '';
+                    } else if(botonApretado === '=') {
+                        if(operacionActual === '' || operacionAnterior === '') return;
+                        calcular();
+                        operacion = undefined;
+                    } else if(botonApretado === '.') {
+                        if(operacionActual.includes('.')) return;
+                        operacionActual = operacionActual.toString() + botonApretado;
+                    } else {
+                        operacionActual = operacionActual.toString() + botonApretado;
+                    }
+                    actualizarPantalla();
+                });
+            });
+
+            function calcular() {
+                let calculo;
+                const anterior = parseFloat(operacionAnterior);
+                const actual = parseFloat(operacionActual);
+                if(isNaN(anterior) || isNaN(actual)) return;
+                switch(operacion) {
+                    case '+':
+                        calculo = anterior + actual;
+                        break;
+                    case '-':
+                        calculo = anterior - actual;
+                        break;
+                    case '*':
+                        calculo = anterior * actual;
+                        break;
+                    case '/':
+                        if(actual === 0) {
+                            calculo = 'Error';
+                        } else {
+                            calculo = anterior / actual;
+                        }
+                        break;
+                    default:
+                        return;
+                }
+                operacionActual = calculo;
+                operacionAnterior = '';
+                operacion = undefined;
+            }
+
+            function actualizarPantalla() {
+                if(operacion != null) {
+                    pantalla.textContent = `${operacionAnterior} ${operacion} ${operacionActual}`;
+                } else {
+                    pantalla.textContent = operacionActual;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
